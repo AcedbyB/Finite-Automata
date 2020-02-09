@@ -18,6 +18,7 @@ DFA new_DFA(int nstates) {
         return NULL; 
     }
     this->nstates = nstates;
+    for(int i = 0; i < 499 ;i++) this -> accept[i] = false;
     return this;
 }
 
@@ -60,11 +61,13 @@ bool DFA_execute(DFA dfa, char *input) {
 }
 
 void unlimitedRunningInput(DFA dfa) {
-    char input[500];
+    char input[500] = "hey";
+    char compare[500] = "exit";
     printf("%s", "Type in a string or type exit to exit: ");
     scanf("%s", input);
-    while(strcmp(input,"exit")) {
-        if(DFA_execute(dfa, input)) printf("%s\n", "True");
+    while(strcmp(input,compare)) {
+        int cur = DFA_execute(dfa, input);
+        if(cur == 1) printf("%s\n", "True");
         else printf("%s\n", "False");
         printf("%s", "Type in a string or type exit to exit: ");
         scanf("%s", input);
@@ -86,7 +89,7 @@ void TestComputerDFA() {
 }
 
 void TestRoflDFA() {
-    printf("%s\n", "Testing Rofl DFA right now:");
+    printf("%s\n", "Testing begins with rofl DFA right now:");
     DFA dfa = new_DFA(100);
     dfa -> accept[4] = 1;
     for(int i = 0; i <= 3; i++) DFA_set_transition_all(dfa, i, 404);
@@ -132,7 +135,7 @@ void TestOddZerosAndOnesDFA() {
 }
 
 void TestILove173() {
-    printf("%s\n", "Testing ILOVE173 DFA right now:");
+    printf("%s\n", "Testing begins with ilove173 DFA right now:");
     DFA dfa = new_DFA(100);
     dfa -> accept[8] = 1;
     for(int i = 0; i < 8; i++) DFA_set_transition_all(dfa, i, 404);

@@ -12,18 +12,16 @@ DFA convertNFAtoDFA(NFA nfa) {
     State[0] = new_Set(100);
     Set_insert(State[0], 0);
     while(curStateIndex < nextPosition) {
-        //printf("\n%d\n", curStateIndex);
         for(int i = 1; i < 119; i++) {
             SetIterator cak = Set_iterator(State[curStateIndex]);
             Set tmp = new_Set(100);
             while(SetIterator_hasNext(cak)) {
                 int lul =  SetIterator_next(cak);
                 if(nfa -> transitionBoard[lul][i] != NULL) {
-                    // printf("lol");
                     Set_union(tmp, nfa -> transitionBoard[lul][i]);
                 }
             }
-            // printf("%d %d \n", i, curStateIndex);
+            free(cak);
             int pos = -1;
             for(int i = 0; i <= curStateIndex; i++) {
                 if(Set_equals(tmp, State[i]) == true) {
@@ -54,6 +52,7 @@ DFA convertNFAtoDFA(NFA nfa) {
             if(nfa -> accept[next] == 1) dfa -> accept[i] = 1;
         }
         Set_free(State[i]);
+        free(cak);
     }
     return dfa;
 }
@@ -78,17 +77,22 @@ void main() {
 
     //Converting NFA to DFA;
     printf("%s\n", "Currently converting emb ending NFA to a DFA");
-    DFA dfa = convertNFAtoDFA(EmbEndingNFA());
+    NFA nfa = EmbEndingNFA();
+    DFA dfa = convertNFAtoDFA(nfa);
     printf("%s\n", "Done!");
     printf("%s\n", "Start testing it:");
     unlimitedRunningInput(dfa);
     DFA_free(dfa);
     dfa = NULL;
+    NFA_free(nfa);
+    nfa = NULL;
 
     printf("%s\n", "Currently converting contains emb NFA to a DFA");
-    dfa = convertNFAtoDFA(ContainsEmbNFA());
+    nfa = ContainsEmbNFA();
+    dfa = convertNFAtoDFA(nfa);
     printf("%s\n", "Done!");
     printf("%s\n", "Start testing it:");
     unlimitedRunningInput(dfa);
     DFA_free(dfa);
+    NFA_free(nfa);
 }

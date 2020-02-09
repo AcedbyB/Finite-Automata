@@ -20,13 +20,17 @@ NFA new_NFA(int nstates) {
         return NULL; 
     }
     this->nstates = nstates;
+    for(int i =0; i < 300; i++) {
+        for(int j =0; j<300;j++) this -> transitionBoard[i][j] = new_Set(100);
+        this -> accept[i] = false;
+    }
     return this;
 }
 
 void NFA_free(NFA nfa) {
-    free(nfa -> accept);
-    for(int i = 1;i<=100;i++)
-        for(int j = 1; j<128;j++) if(nfa -> transitionBoard[i][j] != NULL) Set_free(nfa -> transitionBoard[i][j]);
+    for(int i = 0;i<300;i++) {
+        for(int j = 0; j<300;j++) Set_free(nfa -> transitionBoard[i][j]);
+    }
     free(nfa);
 }
 
@@ -40,13 +44,11 @@ Set NFA_get_transitions(NFA nfa, int state, char sym) {
 }
 
 void NFA_add_transition(NFA nfa, int src, char sym, int dst) {
-    if(nfa -> transitionBoard[src][(int)sym] == NULL) nfa -> transitionBoard[src][(int)sym] = new_Set(100);
     Set_insert(nfa -> transitionBoard[src][(int)sym], dst);
 }
 
 void NFA_add_transition_all(NFA nfa, int src, int dst) {
     for(int i = 1; i < 128; i++ ) {
-        if(nfa -> transitionBoard[src][i] == NULL) nfa -> transitionBoard[src][i] = new_Set(100);
         Set_insert(nfa -> transitionBoard[src][i], dst);
     }
 }
@@ -67,25 +69,32 @@ bool NFA_execute(NFA nfa, char *input) {
         SetIterator cak = Set_iterator(curStates);
         while(SetIterator_hasNext(cak)) {
             int next =  SetIterator_next(cak);
-            if(nfa -> transitionBoard[next][(int)*i] == NULL) return 0;
-            Set_union(temp, nfa -> transitionBoard[next][(int)*i]);
+            if(nfa -> transitionBoard[next][(int)*i] == NULL) continue;
+            else Set_union(temp, nfa -> transitionBoard[next][(int)*i]);
         }
         Set_free(curStates);
         curStates = NULL;
         curStates = new_Set(100);
+        free(cak);
+        cak = NULL;
         cak = Set_iterator(temp);
         while(SetIterator_hasNext(cak)) {
             int next =  SetIterator_next(cak);
             Set_insert(curStates,next);
         }
         Set_free(temp);
+        temp = NULL;
+        free(cak);
     }
+    bool flag = false;
     SetIterator cak = Set_iterator(curStates);
     while(SetIterator_hasNext(cak)) {
         int next =  SetIterator_next(cak);
-        if(nfa -> accept[next]) return true;
+        if(nfa -> accept[next]) flag =true;
     }
-    return false;
+    free(cak);
+    Set_free(curStates);
+    return flag;
 }
 
 void unlimitedRunningInputNFA(NFA nfa) {
